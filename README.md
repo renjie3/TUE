@@ -20,6 +20,7 @@ With more people publishing their personal data online, unauthorized data usage 
 You can find the command for generating Transferable Unlearnable Examples on CIFAR-10 and CIFAR-100 based on three different backbones.
 
 ## To update
+The generated perturbation for CIFAR10 and CIFAR100 will be uploaded for convenience soon.
 The code for unsupervised test will be updated soon.
 
 ## References
