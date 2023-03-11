@@ -4,29 +4,20 @@ import argparse
 parser = argparse.ArgumentParser(description='PyTorch CIFAR10 Training')
 parser.add_argument('--lr', default=0.1, type=float, help='learning rate')
 parser.add_argument('--num_class', default=4, type=int, help='num_class')
-parser.add_argument('--data_name', default='cifar10_20000_triobject', type=str, help='data_name')
 parser.add_argument('--job_id', default='local', type=str, help='job_id')
 parser.add_argument('--load_model', '-r', action='store_true', help='load_model from checkpoint')
 parser.add_argument('--load_model_path', default='', type=str, help='load_model_path')
-parser.add_argument('--test_csd', action='store_true', default=False)
 parser.add_argument('--just_test', action='store_true', default=False)
 parser.add_argument('--no_save', action='store_true', default=False)
 parser.add_argument('--pre_load_name', default='', type=str, help='load_model_path')
 parser.add_argument('--local', default='', type=str, help='The gpu number used on developing node.')
 parser.add_argument('--clean_train', action='store_true', default=False)
-parser.add_argument('--class_4', action='store_true', default=False)
 parser.add_argument('--samplewise', action='store_true', default=False)
 parser.add_argument('--arch', default='resnet18', type=str, help='load_model_path')
 parser.add_argument('--train_data_type', default='cifar10', type=str, help='the data used to train')
-parser.add_argument('--poison_rate', default=1, type=float, help='learning rate')
 parser.add_argument('--perturbation_budget', default=1, type=float, help='learning rate')
-parser.add_argument('--use_part_train', action='store_true', default=False)
-parser.add_argument('--clean_part_train', action='store_true', default=False)
-parser.add_argument('--clean_part_test', action='store_true', default=False)
 parser.add_argument('--training_epoch', default=200, type=int, help='num_class')
 parser.add_argument('--CA_tmax', default=200, type=int, help='num_class')
-parser.add_argument('--use_sub_test', action='store_true', default=False)
-parser.add_argument('--max_sub_test_label_idx', default=1, type=int)
 args = parser.parse_args()
 
 import os
@@ -160,17 +151,17 @@ if __name__ == '__main__':
         save_name_pre = pre_load_name + "_supervised_class{}_{}".format(args.num_class, args.job_id)
 
     if args.train_data_type == 'cifar10':
-        trainset = TransferCIFAR10Pair(root='data', train=True, transform=transform_train, download=True, perturb_tensor_filepath="./results/{}.pt".format(args.pre_load_name), random_noise_class_path=None, perturbation_budget=args.perturbation_budget, class_4=args.class_4, samplewise_perturb=samplewise_perturb, org_label_flag=False, flag_save_img_group=False, clean_train=args.clean_train)
+        trainset = TransferCIFAR10Pair(root='data', train=True, transform=transform_train, download=True, perturb_tensor_filepath="./results/{}.pt".format(args.pre_load_name), perturbation_budget=args.perturbation_budget, samplewise_perturb=samplewise_perturb, clean_train=args.clean_train)
         trainloader = torch.utils.data.DataLoader(trainset, batch_size=128, shuffle=True, num_workers=2)
 
-        testset = CIFAR10Pair(root='data', train=False, transform=transform_test, download=True, class_4=args.class_4, use_sub_test=args.use_sub_test, max_sub_test_label_idx=args.max_sub_test_label_idx)
+        testset = CIFAR10Pair(root='data', train=False, transform=transform_test, download=True)
         testloader = torch.utils.data.DataLoader(testset, batch_size=128, shuffle=False, num_workers=2)
 
     elif args.train_data_type == 'cifar100':
-        trainset = TransferCIFAR100Pair(root='data', train=True, transform=transform_train, download=True, perturb_tensor_filepath="./results/{}.pt".format(args.pre_load_name), random_noise_class_path=None, perturbation_budget=args.perturbation_budget, samplewise_perturb=samplewise_perturb, org_label_flag=False, flag_save_img_group=False, clean_train=args.clean_train)
+        trainset = TransferCIFAR100Pair(root='data', train=True, transform=transform_train, download=True, perturb_tensor_filepath="./results/{}.pt".format(args.pre_load_name), perturbation_budget=args.perturbation_budget, samplewise_perturb=samplewise_perturb, clean_train=args.clean_train)
         trainloader = torch.utils.data.DataLoader(trainset, batch_size=128, shuffle=True, num_workers=2)
 
-        testset = CIFAR100Pair(root='data', train=False, transform=transform_test, download=True, use_sub_test=args.use_sub_test, max_sub_test_label_idx=args.max_sub_test_label_idx)
+        testset = CIFAR100Pair(root='data', train=False, transform=transform_test, download=True)
         testloader = torch.utils.data.DataLoader(testset, batch_size=128, shuffle=False, num_workers=2)
         
 

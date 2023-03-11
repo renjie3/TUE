@@ -17,13 +17,12 @@ With more people publishing their personal data online, unauthorized data usage 
 
 ## Quick Start
 #### Use demo.sh for a quick start.
-You can find the command for generating Transferable Unlearnable Examples on CIFAR-10 and CIFAR-100 based on three different backbones.
+The command for generating Transferable Unlearnable Examples on CIFAR-10 and CIFAR-100 based on three different backbones can be found in demo.sh.
 
 ## Pretrained Unlearnable Examples
-The generated unlearnable perturbations for CIFAR110 and CIFAR100 can be found at [Google Drive](https://drive.google.com/drive/folders/1aS2ePjGXy1g146_OYe4ximaW1vncIMy1?usp=sharing). 
+The generated unlearnable perturbations for CIFAR110 and CIFAR100 can be found at [Google Drive](https://drive.google.com/drive/folders/1aS2ePjGXy1g146_OYe4ximaW1vncIMy1?usp=sharing). The command for using the pretrained data can be found at demo.sh.
 
 ## To update
-The generated perturbation for CIFAR10 and CIFAR100 will be uploaded for convenience soon.
 The code for unsupervised test will be updated soon.
 
 ## References

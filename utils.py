@@ -246,7 +246,7 @@ class TransferSVHNPair(SVHN):
                     self.data[idx] = self.data[idx] + noise
                     self.data[idx] = np.clip(self.data[idx], a_min=0, a_max=255)
                 self.data = self.data.astype(np.uint8)
-            print('load perturb done______________________________')
+            print('Load perturb done.')
         else:
             print('it is clean train')
 
@@ -628,18 +628,14 @@ class CIFAR100Pair(CIFAR100):
 class TransferCIFAR10Pair(CIFAR10):
     """CIFAR10 Dataset.
     """
-    def __init__(self, root='data', train=True, transform=None, download=True, perturb_tensor_filepath=None, random_noise_class_path=None, perturbation_budget=1.0, class_4: bool = True, samplewise_perturb: bool = False, org_label_flag: bool = False, flag_save_img_group: bool = False, perturb_rate: float = 1.0, clean_train=False, kmeans_index=-1, unlearnable_kmeans_label=False, kmeans_label_file='', in_tuple=False, flag_perturbation_budget=False):
+    def __init__(self, root='data', train=True, transform=None, download=True, perturb_tensor_filepath=None, perturbation_budget=1.0, samplewise_perturb: bool = False, flag_save_img_group: bool = False, perturb_rate: float = 1.0, clean_train=False, in_tuple=False, flag_perturbation_budget=False):
         super(TransferCIFAR10Pair, self).__init__(root=root, train=train, download=download, transform=transform)
 
-        self.class_4 = class_4
         self.samplewise_perturb = samplewise_perturb
         self.in_tuple = in_tuple
 
         if perturb_tensor_filepath != None:
             self.perturb_tensor = torch.load(perturb_tensor_filepath)
-            # print(self.perturb_tensor)
-            # print(self.perturb_tensor.shape)
-            # input()
             if flag_perturbation_budget:
                 self.noise_255 = self.perturb_tensor.mul(255*perturbation_budget).clamp_(-255*perturbation_budget, 255*perturbation_budget).permute(0, 2, 3, 1).to('cpu').numpy()
             else:
@@ -660,10 +656,6 @@ class TransferCIFAR10Pair(CIFAR10):
                     if not samplewise_perturb:
                         # raise('class_wise still under development')
                         noise = self.noise_255[self.targets[idx]]
-                        # if org_label_flag:
-                        #     noise = self.noise_255[self.targets[idx]]
-                        # else:
-                        #     noise = self.noise_255[self.random_noise_class[idx]]
                     else:
                         noise = self.noise_255[idx]
                         # print("check it goes samplewise.")
@@ -671,7 +663,7 @@ class TransferCIFAR10Pair(CIFAR10):
                     self.data[idx] = self.data[idx] + noise
                     self.data[idx] = np.clip(self.data[idx], a_min=0, a_max=255)
                 self.data = self.data.astype(np.uint8)
-            print('load perturb done______________________________')
+            print('Load perturb done.')
         else:
             print('it is clean train')
 
@@ -811,20 +803,11 @@ class PoisonTransferCIFAR10Pair(CIFAR10):
 class TransferCIFAR100Pair(CIFAR100):
     """CIFAR10 Dataset.
     """
-    def __init__(self, root='data', train=True, transform=None, download=True, perturb_tensor_filepath=None, random_noise_class_path=None, perturbation_budget=1.0, samplewise_perturb: bool = False, org_label_flag: bool = False, flag_save_img_group: bool = False, perturb_rate: float = 1.0, clean_train=False, kmeans_index=-1, unlearnable_kmeans_label=False, kmeans_label_file='', in_tuple=False, flag_perturbation_budget=False):
+    def __init__(self, root='data', train=True, transform=None, download=True, perturb_tensor_filepath=None, perturbation_budget=1.0, samplewise_perturb: bool = False, flag_save_img_group: bool = False, perturb_rate: float = 1.0, clean_train=False, in_tuple=False, flag_perturbation_budget=False):
         super(TransferCIFAR100Pair, self).__init__(root=root, train=train, download=download, transform=transform)
 
         self.samplewise_perturb = samplewise_perturb
         self.in_tuple = in_tuple
-
-        # if train:
-        #     with open('./cifar100_train_targets.pkl', "wb") as f:
-        #         pickle.dump(self.targets, f)
-        # else:
-        #     with open('./cifar100_test_targets.pkl', "wb") as f:
-        #         pickle.dump(self.targets, f)
-        
-        # input('save_targets done')
 
         if perturb_tensor_filepath != None:
             self.perturb_tensor = torch.load(perturb_tensor_filepath)
@@ -834,31 +817,7 @@ class TransferCIFAR100Pair(CIFAR100):
                 self.noise_255 = self.perturb_tensor.mul(255*perturbation_budget).clamp_(-9, 9).permute(0, 2, 3, 1).to('cpu').numpy()
         else:
             self.perturb_tensor = None
-            if kmeans_index >= 0:
-                if kmeans_label_file == '':
-                    if class_4:
-                        kmeans_filepath = os.path.join(root, "kmeans_label/kmeans_4class.pkl")
-                    else:
-                        if not unlearnable_kmeans_label:
-                            kmeans_filepath = os.path.join(root, "kmeans_label/kmeans_cifar10.pkl")
-                        else:
-                            kmeans_filepath = os.path.join(root, "kmeans_label/kmeans_unlearnable_simclr_label.pkl")
-                else:
-                    kmeans_filepath = os.path.join(root, "kmeans_label/{}.pkl".format(kmeans_label_file))
-                with open(kmeans_filepath, "rb") as f:
-                    kmeans_labels = pickle.load(f)[kmeans_index]
-                    print(kmeans_filepath)
-                    # print(kmeans_labels[:100])
-                    # input()
-                    print("kmeans_label_num: ", np.max(kmeans_labels)+1)
-
-                self.targets = kmeans_labels
             return
-
-        if random_noise_class_path != None:
-            self.random_noise_class = np.load(random_noise_class_path)
-        else:
-            self.random_noise_class = None
         
         self.perturbation_budget = perturbation_budget
 
@@ -883,40 +842,16 @@ class TransferCIFAR100Pair(CIFAR100):
                     self.data[idx] = self.data[idx] + noise
                     self.data[idx] = np.clip(self.data[idx], a_min=0, a_max=255)
                 self.data = self.data.astype(np.uint8)
-            print('load perturb done ______________')
+            print('Load perturb done.')
         else:
             print('it is clean train')
-
-        if kmeans_index >= 0:
-            if kmeans_label_file == '':
-                if class_4:
-                    kmeans_filepath = os.path.join(root, "kmeans_label/kmeans_4class.pkl")
-                else:
-                    if not unlearnable_kmeans_label:
-                        kmeans_filepath = os.path.join(root, "kmeans_label/kmeans_cifar10.pkl")
-                    else:
-                        kmeans_filepath = os.path.join(root, "kmeans_label/kmeans_unlearnable_simclr_label.pkl")
-            else:
-                kmeans_filepath = os.path.join(root, "kmeans_label/{}.pkl".format(kmeans_label_file))
-            with open(kmeans_filepath, "rb") as f:
-                kmeans_labels = pickle.load(f)[kmeans_index]
-                print(kmeans_filepath)
-                print("kmeans_label_num: ", np.max(kmeans_labels)+1)
-
-            self.targets = kmeans_labels
 
 
     def __getitem__(self, index):
         img, target = self.data[index], self.targets[index]
-        # print(img[0][0])
         img = Image.fromarray(img)
-        # print("np.shape(img)", np.shape(img))
 
         if self.transform is not None:
-            # print(self.perturb_tensor[self.random_noise_class[index]][0][0])
-            # print("self.transform(img)", self.transform(img).shape)
-            # pos_1 = torch.clamp(self.transform(img) + self.perturb_tensor[self.random_noise_class[index]] * self.perturbation_budget, 0, 1)
-            # pos_2 = torch.clamp(self.transform(img) + self.perturb_tensor[self.random_noise_class[index]] * self.perturbation_budget, 0, 1)
             pos_1 = torch.clamp(self.transform(img), 0, 1)
             pos_2 = torch.clamp(self.transform(img), 0, 1)
 
